@@ -1,6 +1,7 @@
-import { Card } from "@repo/ui/card";
+import { Card } from "@repo/ui/components/card";
 
 import { prisma } from "@repo/db";
+import { InputOTP } from "@repo/ui/components/ui/input-otp";
 
 export default function Page() {
   return (
@@ -11,8 +12,6 @@ export default function Page() {
       <Card title={"Yo"}
         children={<button>Gurt</button>}
         href={"click here"} />
-
-
     </main>
   );
 }
