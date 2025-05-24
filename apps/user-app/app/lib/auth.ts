@@ -31,6 +31,7 @@ export const authOptions = {
                     // check if password is valid 
                     const isPasswordValid = await bcrypt.compare(credentials.password, existingUser.password);
                     if(isPasswordValid) {
+                        console.log("yes");
                         return {
                             id: existingUser.id.toString(),
                             name: existingUser.name,
@@ -40,10 +41,14 @@ export const authOptions = {
                 }
 
                 // if user doesnot exist return null
+                console.log("no")
                 return null;
             }
         })
     ],
+    pages: {
+        signIn: "auth/signin"
+    },
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         async session({token, session}: any ) {
