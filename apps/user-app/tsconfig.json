@@ -9,6 +9,7 @@
     "baseUrl": ".",
     "paths": {
       "@lib/*": ["./app/lib/*"],
+      "@types/*": ["./app/types/*"],
       "@components/*": ["./components/*"]
     }
   },
