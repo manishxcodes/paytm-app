@@ -1,53 +1,62 @@
 import  CredentialsProvider  from "next-auth/providers/credentials"
 import { prisma } from "@repo/db"
 import bcrypt from "bcrypt"
+import { z } from "zod"
+import { CredentialsTypes } from "../types/auth.types"
 
-
-type CredentialsTypes = {
-    phone: string;
-    password: string;
-}
+const credentialsSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(8),
+})
 
 export const authOptions = {
     providers: [
         CredentialsProvider({
             name: "Credentials",
             credentials: {
-                phone: {label: "Enter your number", type: "text", placeholder: "9876543210"},
+                email: {label: "Enter your email", type: "text", placeholder: "johncena@gmail.com"},
                 password: {
                     label: "Enter password", 
                     type: "password"
                 }
             }, 
-            async authorize(credentials: any) {
+            async authorize(credentials: CredentialsTypes ) {
                 // zod validation
-                const existingUser = await prisma.user.findFirst({
+                const response = credentialsSchema.safeParse(credentials);
+                if(!response.success) return null;
+
+                if(!credentials?.email || !credentials.password) return null;
+                try {
+                    const existingUser = await prisma.user.findFirst({
                     where: {
-                        number: credentials.phone
-                    }
-                });
+                            email: credentials.email
+                        }
+                    });
 
-                if(existingUser) {
-                    // check if password is valid 
-                    const isPasswordValid = await bcrypt.compare(credentials.password, existingUser.password);
-                    if(isPasswordValid) {
-                        console.log("yes");
-                        return {
-                            id: existingUser.id.toString(),
-                            name: existingUser.name,
-                            number: existingUser.number
-                        };
+                    if(existingUser) {
+                        // check if password is valid 
+                        const isPasswordValid = await bcrypt.compare(credentials.password, existingUser.password);
+                        if(isPasswordValid) {
+                            return {
+                                id: existingUser.id.toString(),
+                                name: existingUser.firstName + " " + existingUser.lastName,
+                                number: existingUser.number,
+                                email: existingUser.email
+                            };
+                        }
                     }
+
+                    // if user doesnot exist return null
+                    return null;
+                } catch(err) {
+                    console.log("error", {details: err});
+                    return null;
                 }
-
-                // if user doesnot exist return null
-                console.log("no")
-                return null;
             }
         })
     ],
     pages: {
-        signIn: "auth/signin"
+        signIn: "/auth/signin"
     },
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
