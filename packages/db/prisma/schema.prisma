@@ -21,6 +21,7 @@ model User {
   lastName  String    
   number    String    @unique
   password  String
+  createdAt DateTime @default(now())
 }
 
 model Merchant {
@@ -28,11 +29,15 @@ model Merchant {
   email     String    @unique
   name      String 
   auth_type AuthType
+  createdAt DateTime @default(now())
 }
 
 model Otp {
+  id      String       @id @default(cuid())
   otp     String    
   email   String    @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 }
 
 enum AuthType {
