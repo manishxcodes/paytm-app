@@ -5,8 +5,8 @@ import { z } from "zod"
 import { CredentialsTypes } from "../types/auth.types"
 
 const credentialsSchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(8),
+    email: z.string().email({message: "Enter a valid email"}),
+    password: z.string().min(8, {message: "password must be atleast 8 characters"}),
 })
 
 export const authOptions = {
