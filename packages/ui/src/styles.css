@@ -36,9 +36,9 @@
   --sidebar-accent-foreground: oklch(1.0000 0 0);
   --sidebar-border: oklch(0.8669 0 0);
   --sidebar-ring: oklch(0.8148 0.0819 225.7537);
-  --font-sans: Helvetica;
-  --font-serif: Times New Roman;
-  --font-mono: Monaco;
+  --font-sans: Geist, sans-serif;
+  --font-serif: Space Grotesk, serif;
+  --font-mono: Geist Mono, monospace;
   --radius: 8px;
   --shadow-2xs: 0px 2px 4px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0px 2px 4px 0px hsl(0 0% 0% / 0.05);
