@@ -9,7 +9,7 @@ export function Navbar() {
   return (
     <div className="bg-background shadow-accent-foreground">
         <Container>
-            <div className="flex items-center justify-between ">
+            <div className="flex items-center justify-between py-4">
             <div className="font-semibold">PayTm </div>
                 <div className="flex gap-4">
                     <Button size={"sm"} variant={"outline"} 
