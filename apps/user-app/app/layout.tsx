@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Provider } from "../provider";
+import { Toaster } from "@repo/ui/components/shadcn/sonner"
 
 const geist = Geist({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
       <Provider>
         <body className={geist.className}>
           {children}
+          <Toaster position="top-center" />
         </body>
       </Provider>
     </html>
