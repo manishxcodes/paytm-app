@@ -29,7 +29,7 @@ export function LoginForm({
       email, 
       password,
       redirect: true,
-      callbackUrl: "/"
+      callbackUrl: "/dashboard"
     });
 
     if(response?.error) {
