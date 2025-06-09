@@ -11,9 +11,11 @@ import {
 } from "@repo/ui/components/shadcn/card"
 import { Input } from "@repo/ui/components/shadcn/input"
 import { Label } from "@repo/ui/components/shadcn/label"
-import { useState } from "react"
-import { number } from "zod/v4"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@repo/ui/components/shadcn/input-otp"
+import { toast } from "sonner"
+import { useState } from "react"
+import { UserData, userDataSchema } from "../app/types/auth.types"
+import axios from "axios"
 
 export function SignupForm({
   className,
@@ -26,29 +28,101 @@ export function SignupForm({
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("")
   const [error, setError] = useState("");
-  const [loading, setIsLoading] = useState("");
+  const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"details" | "otp">("details");
   const [resendCountdown, setResendCountDown] = useState(45);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log(email, password, firstName, lastName, phoneNumber, otp);
-    if(step === "details") {
-        console.log("step change", step);
-        setStep("otp");
-        resendTimer();
-        // send otp 
+
+    const userData: UserData = {email, password, firstName, lastName, phoneNumber}
+    // do zod validation
+    const response = userDataSchema.safeParse(userData);
+    if(!response.success) {
+		toast.error("Invalid Credentials", {description: "Please check your credentials"})
+        console.log("error");
+        return;
     }
 
-    // do zod validation 
+    console.log(userData, otp);
 
-    // send otp to user email
+    if(step === "details") {
+        console.log("step change", step);
+        
+        // send otp 
+		try {
+			setLoading(true);
+			const res = await axios.post("/api/otp", {to: userData.email});
+			if(res.data) {
+			console.log("otp sent successfully", {data: res.data});
+			toast("OTP sent successfully", {description: "Check your email"});
+		}
+		} catch(err) {
+			toast.error("Failed to send OTP", {description: "Try again"});
+			console.log("error while sending otp", {details: err});
+		} finally {
+			resendTimer();
+			setStep("otp");
+			setLoading(false);
+		}
+    }
 
-    // if all ok create account
+    if(step === "otp") {
+		try {
+			setLoading(true);
+			// verify otp 
+			const isOtpValid = await axios.get(`/api/otp?email=${email}&otp=${otp}`);
+			if(isOtpValid.status != 200) {
+				toast.error("Wrong OTP", {description: "Enter the correct OTP or try again"});
+				console.log("wrong otp entered");
+				return;
+			}
+			console.log("otp valid")
+
+   			// if all ok create account
+			const response = await axios.post("/api/auth/signup", userData);
+			if(response.status != 200) {
+				toast.error("Failed to signup", {description: "Try again"});
+				console.log("Failed to signin");
+				return;
+			}
+
+			if(response.status === 200) {
+				toast.success("Account Created", {description: "Signin to use the app"});
+				console.log("user created", {data: response.data});
+			}
+		} catch(err) {
+			toast.error("Error", {description: "Try again after some time"});
+			console.log("Something went wrong. Try again", {details: err});
+		} finally{
+			setLoading(false);
+		}
+    }
   }
 
   async function handleResend() {
     resendTimer();
+	try {
+		setLoading(true);
+		// delete previous otp
+		const isOtpDeleted = await axios.delete(`/api/otp?email=${email}&otp=${otp}`);
+		if(isOtpDeleted.status != 200) {
+			toast.error("Something went wrong", {description: "Please try again after some time"});
+			console.log("Couldnot delete OTP");
+			return;
+		}
+
+    	// send new otp
+		const res = await axios.post("/api/otp", {to: email});
+		if(res.data) {
+			console.log("otp", res.data);
+			toast("OTP sent successfully", {description: "Check your email"});
+		}
+	} catch(err) {
+		console.log("Error while deleting otp", {details: err});
+		toast.error("Something went wrong", {description: "Please try again"});
+		return;
+	}
   }
 
   function resendTimer() {
@@ -126,8 +200,9 @@ export function SignupForm({
                             type="text"
                             placeholder="9191939495"
                             required
+                            maxLength={10}
                             value={phoneNumber}
-                            onChange={(e) => {setPhoneNumber("+91" + e.target.value)}}
+                            onChange={(e) => {setPhoneNumber(e.target.value)}}
                             />
                         </div>
                         
