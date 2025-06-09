@@ -1,12 +1,12 @@
 import { prisma } from "@repo/db";
-import { userDataSchema } from "../../../types/auth.types";
+import { UserData, userDataSchema } from "../../../types/auth.types";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt"
 
 export async function POST(req: NextRequest) {
     // get all the inputs 
-    const body = await req.json();
-    
+    const body:UserData = await req.json();
+
     // zod validation
     const response = userDataSchema.safeParse(body);
     if(!response) {
@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
             email: body.email
         }
     });
-        // if exists then tell them to signin
+        
+    // if exists then tell them to signin
     if(existingUser) {
         return NextResponse.json({message: "This email has already been registered by an user. Please signin"});
     }
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
                 firstName: body.firstName,
                 lastName: body.lastName,
                 email: body.email,
-                number: body.number,
+                number: body.phoneNumber,
                 password: hashedPassword,
             }
         });
