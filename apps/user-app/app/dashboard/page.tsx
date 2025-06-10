@@ -1,5 +1,10 @@
+import { Navbar } from "@components/navbar";
+
 export default function Dashboard() {
     return (
-        <div>Hello Dashboard</div>
+        <div>
+            <Navbar />
+            Hello Dashboard
+        </div>
     )
 }
