@@ -21,8 +21,10 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
+    setLoading(true);
     e.preventDefault();
     console.log(email, password);
     const response = await signIn("credentials", {
@@ -38,9 +40,15 @@ export function LoginForm({
       console.log("error: user not found" )
     }
 
+    if(error) {
+      console.log("error: ", error);
+    }
+
     if(response?.ok) {
       console.log("ok")
     }
+
+    setLoading(false);
   }
 
   return (
@@ -85,7 +93,7 @@ export function LoginForm({
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full" onClick={handleSubmit}>
-                  Login
+                  {loading ? "Loading.." : "Login" }
                 </Button>
               </div>
             </div>
