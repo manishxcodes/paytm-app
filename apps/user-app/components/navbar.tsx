@@ -19,6 +19,7 @@ export function Navbar() {
                         <Button size={"sm"} variant={"outline"} 
                             onClick={() => {signOut({callbackUrl: "/"})}}>Sign Out
                         </Button>
+                        <div>{session.user.name}</div>
                     </div>
                     : <div className="flex gap-4">
                         <Button size={"sm"} variant={"outline"} 
