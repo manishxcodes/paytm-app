@@ -17,7 +17,7 @@ export function AddMoney() {
     const [redirectUrl, setRedirectUrl] = useState(SUPPORTED_BANKS[0]?.redirectUrl);
 
     return (
-        <Card className="">
+        <Card className="w-full min-w-lg min-h-[200]">
             <CardHeader>
                 <CardTitle>Add Money</CardTitle>
             </CardHeader> 
