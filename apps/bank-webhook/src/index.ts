@@ -2,14 +2,17 @@ import express from "express"
 import { prisma } from "@repo/db"
 
 const app = express();
+const port = process.env.PORT || 8000;
 
-app.post("/", async (req, res) => {
+app.use(express.json());
+
+app.post("/hdfcWebhook", async (req, res) => {
     // todo: zod validation
     // check if this request came from hdfc bank, use a webhook secret here
     const paymentInfo = {
         token: req.body.token,
         userId: req.body.user_identifier,
-        amount: req.body.amount
+        amount: Number(req.body.amount)
     };
 
     try {
@@ -39,6 +42,7 @@ app.post("/", async (req, res) => {
             message: "Captured"
         }).status(200);
     } catch(err) {
+        console.error({details: err})
         res.json({
             message: "Error while processing webhook",
             err: err
@@ -46,6 +50,6 @@ app.post("/", async (req, res) => {
     }
 })
 
-app.listen(8000, () => {
-    console.log("listening on port 8000")
+app.listen(port, () => {
+    console.log( `listening on port ${port}`);
 })
